@@ -7,6 +7,8 @@ use App\Models\Berita;
 use App\Models\Fasilitas;
 use App\Models\Prestasi;
 use App\Models\Pendaftaran;
+use App\Models\Presensi;
+use App\Models\Tugas;
 
 // 1. Route Halaman Utama Landing Page
 Route::get('/', function () {
@@ -153,4 +155,71 @@ Route::get('/dashboard/export-csv', function () {
 Route::post('/ganti-ta', function (Request $request) {
     session(['tahun_ajaran' => $request->tahun_ajaran]);
     return back();
+});
+
+// 11. Route Tampilan & Input Daftar Kehadiran (Presensi)
+Route::get('/presensi', function () {
+    $siswas = Pendaftaran::all();
+    $presensis = Presensi::orderByDesc('tanggal')->orderByDesc('id')->get();
+    return view('presensi', compact('siswas', 'presensis'));
+});
+
+// Proses Simpan Presensi Kehadiran
+Route::post('/presensi/store', function (Request $request) {
+    $validated = $request->validate([
+        'nama_siswa' => 'required|string|max:100',
+        'paket'      => 'required|string|max:50',
+        'tanggal'    => 'required|date',
+        'status'     => 'required|in:Hadir,Izin,Sakit,Alpa',
+        'keterangan' => 'nullable|string|max:255',
+    ]);
+
+    Presensi::create($validated);
+    return redirect('/presensi')->with('sukses', 'Data kehadiran berhasil dicatat!');
+});
+
+// Hapus Data Presensi
+Route::delete('/presensi/delete/{id}', function ($id) {
+    $presensi = Presensi::findOrFail($id);
+    $presensi->delete();
+    return redirect('/presensi')->with('sukses', 'Data kehadiran berhasil dihapus.');
+});
+
+// 12. Route Tampilan & Pengumpulan Tugas
+Route::get('/tugas', function () {
+    $siswas = Pendaftaran::all();
+    $tugasList = Tugas::latest()->get();
+    return view('tugas', compact('siswas', 'tugasList'));
+});
+
+// Proses Simpan Pengumpulan Tugas
+Route::post('/tugas/store', function (Request $request) {
+    $validated = $request->validate([
+        'nama_siswa'     => 'required|string|max:100',
+        'mata_pelajaran' => 'required|string|max:100',
+        'judul_tugas'    => 'required|string|max:150',
+        'link_tugas'     => 'required|url',
+    ]);
+
+    $validated['status_nilai'] = 'Belum Dinilai';
+    Tugas::create($validated);
+
+    return redirect('/tugas')->with('sukses', 'Tugas berhasil dikumpulkan dan tercatat di sistem!');
+});
+
+// Proses Ubah Status Menjadi "Sudah Dinilai"
+Route::post('/tugas/nilai/{id}', function ($id) {
+    $tugas = Tugas::findOrFail($id);
+    $tugas->update([
+        'status_nilai' => 'Sudah Dinilai',
+    ]);
+
+    return redirect('/tugas')->with('sukses', 'Status tugas berhasil diperbarui menjadi Sudah Dinilai!');
+});
+
+// Hapus Data Pengumpulan Tugas
+Route::delete('/tugas/delete/{id}', function ($id) {
+    $tugas = Tugas::findOrFail($id);
+    $tugas->delete();
+    return redirect('/tugas')->with('sukses', 'Data pengumpulan tugas berhasil dihapus.');
 });

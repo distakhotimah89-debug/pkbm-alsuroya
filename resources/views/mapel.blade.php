@@ -32,6 +32,8 @@
                     <a href="/data-ppdb"><i class="fa-solid fa-users me-2"></i> Data PPDB</a>
                     <a href="/rombel"><i class="fa-solid fa-layer-group me-2"></i> Data Rombel</a>
                     <a href="/mapel" class="active"><i class="fa-solid fa-book me-2"></i> Modul Mapel</a>
+                    <a href="/presensi"><i class="fa-solid fa-clipboard-user me-2"></i> Daftar Kehadiran</a>
+                    <a href="/tugas"><i class="fa-solid fa-file-circle-check me-2"></i> Pengumpulan Tugas</a>
                     <hr class="border-secondary my-3">
                     <a href="/" class="text-danger"><i class="fa-solid fa-right-from-bracket me-2"></i> Keluar</a>
                 </nav>
